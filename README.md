@@ -1,36 +1,88 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AcademiaFlow
 
-## Getting Started
+Master Your Academic Journey & Student Productivity. AcademiaFlow is a highly optimized, fully static, offline-first Progressive Web App (PWA) designed to help high-performers track their academic trajectory across all educational levels while simultaneously managing their productivity.
 
-First, run the development server:
+## Project Overview & Architecture
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+AcademiaFlow is built natively on Next.js 14 (App Router) and Tailwind CSS. It is architected as a **Zero-Backend Application**:
+- **Offline-First Storage:** State is persisted entirely in the browser's `localStorage`. No databases, no cloud authentication, no tracking. Total privacy.
+- **PWA Capabilities:** Complete Service Worker integration allows the application to be installed on any device (iOS, Android, Desktop) like a native app.
+- **Data Portability:** Extensive, detailed JSON and CSV export/import functionality allows users to seamlessly backup and migrate their data across devices manually.
+- **Mobile-App UI:** Features a bottom navigation bar layout for mobile devices, maximizing usability and mimicking a true native mobile experience.
+
+### Core Features
+- **School (Grades 1-12):** Manage multiple exam instances (e.g. Mid-Terms, Finals) per grade, with infinite subjects and automated percentage calculators.
+- **Undergraduate & Postgraduate:** Create multiple degrees simultaneously. Dynamically unlocks 6, 8, 10, or 12 semesters based on duration. Calculates current and estimated final percentage dynamically.
+- **Doctorate (Ph.D.):** Log coursework CGPA, defense status, and track unlimited publications, conferences, and journal papers with DOI links.
+- **Productivity Suite:** Two-pane productivity dashboard. An interactive To-Do list with priorities/deadlines, and a separate "Quick Notes" section for drafting ideas.
+
+---
+
+## Detailed Customization & Editing Guide
+
+AcademiaFlow is structured intuitively so any developer can extend or modify it safely without causing merge conflicts.
+
+### 1. Folder Structure Breakdown
+```
+├── public/
+│   ├── assets/icons/       # Source SVG logos and sharp generated icons
+│   ├── sw.js               # Service Worker for PWA functionality
+│   └── site.webmanifest    # Web app manifest defining standalone UI behavior
+├── src/
+│   ├── app/
+│   │   ├── layout.tsx      # Root layout, ThemeProvider, and ServiceWorker registration
+│   │   ├── page.tsx        # Main entry point; manages the Bottom Navigation state and tab rendering
+│   │   └── globals.css     # Global Tailwind CSS and custom keyframe animations
+│   ├── components/         # Reusable UI Modules
+│   │   ├── Navbar.tsx      # Header with PWA install prompts and Dark mode toggle
+│   │   ├── BottomNav.tsx   # Mobile-app style navigation controller
+│   │   ├── Preloader.tsx   # Intro animation (shown once per session)
+│   │   ├── ProductivitySuite.tsx # Tasks and Quick notes implementation
+│   │   ├── SaveControl.tsx # The entire Data tab logic (JSON/CSV Export, Import)
+│   │   └── *Calculator.tsx # The 4 independent academic calculators
+│   ├── lib/
+│   │   └── utils.ts        # Helper functions (cn) and INITIAL_ACADEMIC_STATE
+│   └── types/
+│       └── academic.ts     # Core TypeScript schema definitions.
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. How to Add a New Field to a Calculator
+If you want to add a new field (e.g. "Teacher Name") to the School component:
+1. **Update the Type**: Go to `src/types/academic.ts` and add `teacherName: string;` to the `SchoolExam` interface.
+2. **Update Initial State**: Go to `src/lib/utils.ts` and add `teacherName: ""` inside the `SchoolExam` objects within `INITIAL_ACADEMIC_STATE`.
+3. **Update UI**: Go to `src/components/SchoolCalculator.tsx`, locate the `grid` where inputs are rendered, and add a new input. Hook it up using `onChange={(e) => handleUpdateExam(exam.id, "teacherName", e.target.value)}`.
+4. **Update CSV Export**: Go to `src/components/SaveControl.tsx`, locate the `handleExportCSV` function, and append the new `teacherName` to the School CSV headers and data rows.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. How to Modify the Design/Theme
+- The app uses standard **Tailwind CSS**. Open `src/app/globals.css` to modify core variables.
+- We rely extensively on Tailwind's dark mode via the `dark:` prefix.
+- Primary theme color is `emerald-500` to `teal-700`. To change this, perform a global find-and-replace for `emerald` and `teal` to your desired Tailwind color palettes (e.g., `blue`, `indigo`).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## Data Schema & Portability
 
-To learn more about Next.js, take a look at the following resources:
+Because AcademiaFlow has no database, users maintain ownership of their data. The application uses a complex nested JSON structure defined by `AcademiaFlowState` in `src/types/academic.ts`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The `SaveControl.tsx` file handles parsing this massive object. When a user clicks "Export CSV", the application safely flattens these arrays into standard comma-separated values so students can visualize their trajectory in Excel or Google Sheets.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## Cloudflare Pages Deployment Guide
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+AcademiaFlow is optimized to be deployed instantly on Cloudflare Pages without any build configuration errors. It uses the `output: 'export'` feature of Next.js to compile to entirely static files.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1.  Push your customized repository to your GitHub account.
+2.  Log in to the [Cloudflare Dashboard](https://dash.cloudflare.com/) and navigate to **Workers & Pages**.
+3.  Click **Create application** -> **Pages** -> **Connect to Git**.
+4.  Select your repository.
+5.  **Build Settings:**
+    - Framework preset: `Next.js (Static HTML Export)`
+    - Build command: `npm run build`
+    - Build output directory: `out`
+6.  Click **Save and Deploy**.
+
+Your site is now live globally, edge-cached, and fully offline-capable.
+
+---
+*Powered by [Saamio](https://saamio.com)*
