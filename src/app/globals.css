@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+@theme {
+  --animate-shrink: shrink 5s linear forwards;
+}
+
+@keyframes shrink {
+  from { width: 100%; }
+  to { width: 0%; }
+}
+
 @layer base {
   :root {
     --font-montserrat: 'Montserrat', sans-serif;
