@@ -1,9 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Download } from "lucide-react";
+import { useTheme } from "next-themes";
+import { Sun, Moon, Download } from "lucide-react";
 
 export function Navbar() {
+  const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isInstallable, setIsInstallable] = useState(false);
