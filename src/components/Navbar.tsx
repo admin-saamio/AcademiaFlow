@@ -87,7 +87,7 @@ export function Navbar() {
           
           {/* Brand Logo */}
           <div className="flex items-center gap-2">
-            <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center text-white font-bold text-xl shadow-md shadow-emerald-500/20">
+            <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center text-white font-bold text-lg sm:text-xl shadow-md shadow-emerald-500/20 shrink-0">
               A
             </div>
             <span className="font-extrabold text-xl sm:text-2xl tracking-tight text-slate-900 dark:text-white font-montserrat">
