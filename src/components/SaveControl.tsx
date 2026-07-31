@@ -3,6 +3,7 @@
 import React, { useState, useRef } from "react";
 import { AcademiaFlowState } from "@/types/academic";
 import { Database, Download, Upload, CheckCircle2, Info, FileSpreadsheet } from "lucide-react";
+import { Database, Download, Upload, CheckCircle2, Info } from "lucide-react";
 import confetti from "canvas-confetti";
 
 interface SaveControlProps {
@@ -23,6 +24,12 @@ export function SaveControl({ state, onImport }: SaveControlProps) {
     const dataStr = JSON.stringify(state, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
     const exportFileDefaultName = `academiaflow-backup-${new Date().toISOString().split('T')[0]}.json`;
+  const handleExport = () => {
+    const dataStr = JSON.stringify(state, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+
+    const exportFileDefaultName = `academiaflow-backup-${new Date().toISOString().split('T')[0]}.json`;
+
     const linkElement = document.createElement('a');
     linkElement.setAttribute('href', dataUri);
     linkElement.setAttribute('download', exportFileDefaultName);
@@ -33,82 +40,30 @@ export function SaveControl({ state, onImport }: SaveControlProps) {
   };
 
   const handleExportCSV = () => {
+    // Generate a simple CSV representation of School & UG degrees as an example
     let csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += "Type,Degree/Grade,Name,Institution,Duration/Completion Year\n";
 
-    // Helper to safely escape CSV strings
-    const escapeCSV = (str: string | number) => `"${String(str).replace(/"/g, '""')}"`;
-
-    const studentName = escapeCSV(state.studentName || "Unknown Student");
-
-    // 1. School Data
-    csvContent += "=== SCHOOL RECORDS ===\n";
-    csvContent += "Student Name,Grade,Exam Name,Institution,City/Country,Year,Subject,Max Marks,Obtained Marks\n";
+    // Add School
     Object.entries(state.school.examsByGrade).forEach(([grade, exams]) => {
       exams.forEach(exam => {
-        if (exam.subjects.length === 0) {
-           csvContent += `${studentName},${escapeCSV(grade)},${escapeCSV(exam.examName)},${escapeCSV(exam.institutionName)},${escapeCSV(exam.cityCountry)},${escapeCSV(exam.yearOfCompletion)},N/A,0,0\n`;
-        } else {
-          exam.subjects.forEach(sub => {
-            csvContent += `${studentName},${escapeCSV(grade)},${escapeCSV(exam.examName)},${escapeCSV(exam.institutionName)},${escapeCSV(exam.cityCountry)},${escapeCSV(exam.yearOfCompletion)},${escapeCSV(sub.name)},${sub.max},${sub.obtained}\n`;
-          });
-        }
+        csvContent += `"School","${grade}","${exam.examName}","${exam.institutionName}","${exam.yearOfCompletion}"\n`;
       });
     });
-    csvContent += "\n";
 
-    // 2. UG Data
-    csvContent += "=== UNDERGRADUATE RECORDS ===\n";
-    csvContent += "Student Name,Degree Name,College,City/Country,Duration Years,Semester,SGPA,Subject Name,Max Marks,Obtained Marks\n";
+    // Add UG
     state.undergraduate.forEach(ug => {
-      ug.semesters.forEach(sem => {
-        if (sem.subjects.length === 0) {
-           csvContent += `${studentName},${escapeCSV(ug.degreeName)},${escapeCSV(ug.collegeName)},${escapeCSV(ug.cityCountry)},${ug.durationYears},${sem.semNumber},${sem.sgpa},N/A,0,0\n`;
-        } else {
-          sem.subjects.forEach(sub => {
-            csvContent += `${studentName},${escapeCSV(ug.degreeName)},${escapeCSV(ug.collegeName)},${escapeCSV(ug.cityCountry)},${ug.durationYears},${sem.semNumber},${sem.sgpa},${escapeCSV(sub.name)},${sub.max},${sub.obtained}\n`;
-          });
-        }
-      });
+      csvContent += `"Undergraduate","N/A","${ug.degreeName}","${ug.collegeName}","${ug.durationYears} Years"\n`;
     });
-    csvContent += "\n";
 
-    // 3. PG Data
-    csvContent += "=== POSTGRADUATE RECORDS ===\n";
-    csvContent += "Student Name,Degree Name,University,Duration Years,Semester,SGPA\n";
+    // Add PG
     state.postgraduate.forEach(pg => {
-      pg.semesters.forEach(sem => {
-        csvContent += `${studentName},${escapeCSV(pg.degreeName)},${escapeCSV(pg.universityName)},${pg.durationYears},${sem.semNumber},${sem.sgpa}\n`;
-      });
+      csvContent += `"Postgraduate","N/A","${pg.degreeName}","${pg.universityName}","${pg.durationYears} Years"\n`;
     });
-    csvContent += "\n";
 
-    // 4. PhD Data
-    csvContent += "=== DOCTORATE RECORDS ===\n";
-    csvContent += "Student Name,Thesis Title,Coursework CGPA,Defense Status,Publication Title,Venue,Year,Status,DOI\n";
+    // Add PhD
     state.doctorate.forEach(phd => {
-      if (phd.publications.length === 0) {
-        csvContent += `${studentName},${escapeCSV(phd.thesisTitle)},${phd.courseworkCgpa},${escapeCSV(phd.defenseStatus)},N/A,N/A,N/A,N/A,N/A\n`;
-      } else {
-        phd.publications.forEach(pub => {
-          csvContent += `${studentName},${escapeCSV(phd.thesisTitle)},${phd.courseworkCgpa},${escapeCSV(phd.defenseStatus)},${escapeCSV(pub.title)},${escapeCSV(pub.venue)},${escapeCSV(pub.year)},${escapeCSV(pub.status)},${escapeCSV(pub.doiLink)}\n`;
-        });
-      }
-    });
-    csvContent += "\n";
-
-    // 5. Productivity
-    csvContent += "=== PRODUCTIVITY TASKS ===\n";
-    csvContent += "Student Name,Task Title,Deadline,Priority,Completed\n";
-    state.todos.forEach(todo => {
-      csvContent += `${studentName},${escapeCSV(todo.title)},${escapeCSV(todo.deadline)},${escapeCSV(todo.priority)},${todo.completed ? 'Yes' : 'No'}\n`;
-    });
-    csvContent += "\n";
-
-    // 6. Notes
-    csvContent += "=== QUICK NOTES ===\n";
-    csvContent += "Student Name,Note Title,Last Updated,Content\n";
-    state.notes.forEach(note => {
-      csvContent += `${studentName},${escapeCSV(note.title)},${escapeCSV(note.updatedAt)},${escapeCSV(note.content)}\n`;
+      csvContent += `"Doctorate","N/A","${phd.thesisTitle}","N/A","${phd.defenseStatus}"\n`;
     });
 
     const encodedUri = encodeURI(csvContent);
@@ -121,6 +76,46 @@ export function SaveControl({ state, onImport }: SaveControlProps) {
 
     confetti({ particleCount: 80, spread: 70, origin: { y: 0.8 } });
     showToast("CSV exported successfully!");
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const json = JSON.parse(event.target?.result as string);
+        if (json && json.academicLevel) {
+          onImport(json);
+          confetti({
+            particleCount: 100,
+            spread: 80,
+            origin: { y: 0.8 },
+          });
+          showToast("Data imported successfully!");
+        } else {
+          showToast("Invalid backup file format.");
+        }
+      } catch (err) {
+        console.error(err);
+        showToast("Error parsing backup file.");
+      }
+    };
+    reader.readAsText(file);
+
+
+    confetti({
+      particleCount: 80,
+      spread: 70,
+      origin: { y: 0.8 },
+    });
+
+    showToast("Data exported successfully!");
   };
 
   const handleImportClick = () => {
@@ -186,6 +181,7 @@ export function SaveControl({ state, onImport }: SaveControlProps) {
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 Export or import your academic records.
               </p>
+
             </div>
           </div>
 
@@ -206,56 +202,24 @@ export function SaveControl({ state, onImport }: SaveControlProps) {
               Import Data
             </button>
 
-            <div className="flex gap-2 w-full sm:w-auto">
-              <button
-                onClick={handleExportJSON}
-                className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-md shadow-emerald-600/20 transition-all flex items-center justify-center gap-2 min-h-[44px]"
-              >
-                <Download className="w-4 h-4" />
-                Export JSON
-              </button>
-              <button
-                onClick={handleExportCSV}
-                className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold text-sm shadow-md shadow-teal-600/20 transition-all flex items-center justify-center gap-2 min-h-[44px]"
-              >
-                <FileSpreadsheet className="w-4 h-4" />
-                Export CSV
-              </button>
-            </div>
+            <button
+              onClick={handleExport}
+              className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-md shadow-emerald-600/20 transition-all flex items-center justify-center gap-2 min-h-[44px]"
+            >
+              <Download className="w-4 h-4" />
+              Export Data
+            </button>
           </div>
         </div>
 
-        {/* Hint Banner & Transfer Guide */}
-        <div className="bg-slate-50 dark:bg-slate-800/50 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-700/50 space-y-4">
-          <div className="flex items-start gap-3">
-            <Info className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
-            <div>
-              <p className="text-sm text-slate-700 dark:text-slate-300 font-medium">
-                <strong>Your data is strictly private and saved automatically in your browser.</strong>
-                Since AcademiaFlow operates offline without a cloud database, you must manually transfer your data to use it on another device (like your phone).
-              </p>
-
-              <div className="mt-4 space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-                <h5 className="font-bold text-slate-900 dark:text-white uppercase tracking-wider text-[11px]">How to transfer your records to a new device:</h5>
-
-                <div className="flex items-start gap-3 p-3 bg-white dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                  <div className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 font-bold flex items-center justify-center shrink-0 text-xs">1</div>
-                  <p>On your current device, click the <strong>Export JSON</strong> button above. This will download a `.json` backup file containing your entire academic history and tasks.</p>
-                </div>
-
-                <div className="flex items-start gap-3 p-3 bg-white dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                  <div className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 font-bold flex items-center justify-center shrink-0 text-xs">2</div>
-                  <p>Send this `.json` file to your new device (via Email, WhatsApp, AirDrop, or a USB drive).</p>
-                </div>
-
-                <div className="flex items-start gap-3 p-3 bg-white dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                  <div className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 font-bold flex items-center justify-center shrink-0 text-xs">3</div>
-                  <p>Open AcademiaFlow on your new device, navigate to this Data tab, click <strong>Import Data</strong>, and select the `.json` file you transferred.</p>
-                </div>
-              </div>
-            </div>
-          </div>
+        {/* Hint Banner */}
+        <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl text-xs text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700/50">
+          <Info className="w-4 h-4 text-emerald-500 shrink-0" />
+          <p>
+            <strong>Your data is saved automatically in your browser.</strong> Export your data to back it up or transfer it to another device.
+          </p>
         </div>
+
 
       </div>
     </div>
