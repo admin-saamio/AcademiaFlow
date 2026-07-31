@@ -82,7 +82,7 @@ export function AcademicLevelSelector({
             )}
           </div>
           <h3 className="font-bold text-lg text-slate-900 dark:text-white font-montserrat">
-            Undergraduate (Bachelor's)
+            Undergraduate (Bachelor&apos;s)
           </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
             B.Tech, B.Sc, B.Com multi-year semester SGPA & cumulative CGPA logic.
@@ -109,10 +109,10 @@ export function AcademicLevelSelector({
             )}
           </div>
           <h3 className="font-bold text-lg text-slate-900 dark:text-white font-montserrat">
-            Postgraduate (Master's)
+            Postgraduate (Master&apos;s)
           </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            M.Tech, M.Sc, MBA credit structures & Master's thesis evaluation.
+            M.Tech, M.Sc, MBA credit structures & Master&apos;s thesis evaluation.
           </p>
         </div>
 
