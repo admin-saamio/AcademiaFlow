@@ -116,7 +116,7 @@ export function SchoolCalculator({ data, onChange }: SchoolCalculatorProps) {
       </div>
 
       {/* Subject Marks Entry Table */}
-      <div className="bg-slate-50 dark:bg-slate-800/40 p-5 rounded-2xl border border-slate-200 dark:border-slate-700/60 space-y-4">
+      <div className="bg-slate-50 dark:bg-slate-800/40 p-5 rounded-2xl border border-slate-200 dark:border-slate-700/60 space-y-4 overflow-x-auto max-w-full">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <h4 className="font-bold text-slate-900 dark:text-white text-base flex items-center gap-2">
             <Award className="w-5 h-5 text-emerald-500" />
@@ -124,7 +124,7 @@ export function SchoolCalculator({ data, onChange }: SchoolCalculatorProps) {
           </h4>
           <button
             onClick={handleAddSubject}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-md shadow-emerald-600/20 transition-all"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-md shadow-emerald-600/20 transition-all min-h-[44px]"
           >
             <Plus className="w-4 h-4" /> Add Subject
           </button>
@@ -190,7 +190,7 @@ export function SchoolCalculator({ data, onChange }: SchoolCalculatorProps) {
                   <div className="sm:col-span-1 flex justify-end">
                     <button
                       onClick={() => handleRemoveSubject(sub.id)}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors"
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
                       title="Remove Subject"
                     >
                       <Trash2 className="w-4 h-4" />

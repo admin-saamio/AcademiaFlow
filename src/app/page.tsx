@@ -9,34 +9,40 @@ import { PGCalculator } from "@/components/PGCalculator";
 import { PhDTracker } from "@/components/PhDTracker";
 import { ProductivitySuite } from "@/components/ProductivitySuite";
 import { SaveControl } from "@/components/SaveControl";
-import { useAuth } from "@/context/AuthContext";
-import { AcademicTrackerState, AcademicLevel } from "@/types/academic";
+import { AcademiaFlowState, AcademicLevel } from "@/types/academic";
 import { INITIAL_ACADEMIC_STATE } from "@/lib/utils";
 import { Sparkles, Calculator, BookOpen, Layers } from "lucide-react";
 
 export default function Home() {
-  const { cloudData } = useAuth();
-  const [state, setState] = useState<AcademicTrackerState>(INITIAL_ACADEMIC_STATE);
+  const [state, setState] = useState<AcademiaFlowState>(INITIAL_ACADEMIC_STATE);
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  // Synchronize state when Cloud Firestore data is retrieved upon Google Login
+  // Load from local storage on mount
   useEffect(() => {
-    if (cloudData) {
-      setState(cloudData);
-    } else {
-      // Check local storage draft
-      try {
-        const savedDraft = localStorage.getItem("academic_tracker_draft");
-        if (savedDraft) {
-          const parsed = JSON.parse(savedDraft);
-          if (parsed && parsed.academicLevel) {
-            setState(parsed);
-          }
+    try {
+      const savedDraft = localStorage.getItem("academiaflow_draft");
+      if (savedDraft) {
+        const parsed = JSON.parse(savedDraft);
+        if (parsed && parsed.academicLevel) {
+          setState(parsed);
         }
+      }
+    } catch (err) {
+      console.warn("Failed to load local draft:", err);
+    }
+    setIsLoaded(true);
+  }, []);
+
+  // Save to local storage on state change
+  useEffect(() => {
+    if (isLoaded) {
+      try {
+        localStorage.setItem("academiaflow_draft", JSON.stringify(state));
       } catch (err) {
-        console.warn("Failed to load local draft:", err);
+        console.warn("Failed to save local draft:", err);
       }
     }
-  }, [cloudData]);
+  }, [state, isLoaded]);
 
   // Level selector handler
   const handleSelectLevel = (level: AcademicLevel) => {
@@ -72,7 +78,7 @@ export default function Home() {
             </h1>
             
             <p className="text-sm sm:text-base text-slate-300">
-              Seamless score calculations for School (Grades 1–12), Bachelor's, Master's, and Ph.D. degrees with live year-to-semester unlocking and Cloud Firestore auto-sync.
+              Seamless score calculations for School (Grades 1–12), Bachelor's, Master's, and Ph.D. degrees with offline-first local storage tracking.
             </p>
           </div>
         </div>
@@ -155,8 +161,8 @@ export default function Home() {
           }
         />
 
-        {/* 5. REAL-TIME AUTO-SAVE & FIRESTORE DATABASE SYNCHRONIZATION */}
-        <SaveControl state={state} />
+        {/* 5. DATA MANAGEMENT & EXPORT/IMPORT */}
+        <SaveControl state={state} onImport={(newState) => setState(newState)} />
 
       </main>
 
@@ -164,10 +170,10 @@ export default function Home() {
       <footer className="w-full border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-8 mt-12">
         <div className="max-w-7xl mx-auto px-4 text-center space-y-2">
           <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-            AcademicTracker. &copy; {new Date().getFullYear()} &mdash; Empowering students worldwide with intelligent grade tracking & productivity workflows.
+            &copy; 2026 AcademiaFlow. All rights reserved. &mdash; Empowering students worldwide with intelligent grade tracking & productivity workflows.
           </p>
           <p className="text-[11px] text-slate-400 dark:text-slate-600">
-            Powered by Next.js App Router, Tailwind CSS, and Firebase Cloud Firestore.
+            <a href="https://saamio.com" target="_blank" rel="noopener noreferrer" className="font-semibold text-emerald-600 dark:text-emerald-400 hover:underline">Powered by Saamio</a>
           </p>
         </div>
       </footer>

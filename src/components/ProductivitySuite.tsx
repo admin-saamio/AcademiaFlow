@@ -154,7 +154,7 @@ export function ProductivitySuite({
                 <div className="sm:col-span-3">
                   <button
                     type="submit"
-                    className="w-full py-1.5 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs flex items-center justify-center gap-1 shadow-md shadow-emerald-600/20 transition-all"
+                    className="w-full py-1.5 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs flex items-center justify-center gap-1 shadow-md shadow-emerald-600/20 transition-all min-h-[44px]"
                   >
                     <Plus className="w-4 h-4" /> Add Task
                   </button>
@@ -266,9 +266,9 @@ export function ProductivitySuite({
               />
               <button
                 type="submit"
-                className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs flex items-center gap-1 shadow-md shadow-emerald-600/20 transition-all"
+                className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs flex items-center gap-1 shadow-md shadow-emerald-600/20 transition-all min-h-[44px] min-w-[44px] justify-center"
               >
-                <Plus className="w-4 h-4" /> Add
+                <Plus className="w-4 h-4" /> <span className="hidden sm:inline">Add</span>
               </button>
             </form>
 
