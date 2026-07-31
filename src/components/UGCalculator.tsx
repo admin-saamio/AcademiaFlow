@@ -186,7 +186,7 @@ export function UGCalculator({ data, onChange }: UGCalculatorProps) {
       {data.length === 0 ? (
         <div className="text-center py-10 bg-slate-50 dark:bg-slate-800/40 rounded-3xl border border-slate-200 dark:border-slate-700 border-dashed">
           <GraduationCap className="w-10 h-10 mx-auto text-slate-400 mb-2" />
-          <p className="text-slate-500 font-medium">No undergraduate records. Click &quot;Add Degree&quot; to start.</p>
+          <p className="text-slate-500 font-medium">No undergraduate records. Click "Add Degree" to start.</p>
         </div>
       ) : (
         data.map((degree) => {
@@ -237,7 +237,7 @@ export function UGCalculator({ data, onChange }: UGCalculatorProps) {
                       type="text"
                       value={degree.collegeName}
                       onChange={(e) => handleInputChange(degree.id, "collegeName", e.target.value)}
-                      placeholder="e.g. University Name"
+                      placeholder="e.g. MIT"
                       className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
                     />
                   </div>
@@ -250,7 +250,7 @@ export function UGCalculator({ data, onChange }: UGCalculatorProps) {
                       type="text"
                       value={degree.cityCountry}
                       onChange={(e) => handleInputChange(degree.id, "cityCountry", e.target.value)}
-                      placeholder="e.g. Bhatkal, India"
+                      placeholder="e.g. Boston, USA"
                       className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
                     />
                   </div>

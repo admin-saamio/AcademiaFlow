@@ -79,15 +79,7 @@ export interface RevisionCheckitem {
   completed: boolean;
 }
 
-export interface NoteItem {
-  id: string;
-  title: string;
-  content: string;
-  updatedAt: string;
-}
-
 export interface AcademiaFlowState {
-  studentName: string;
   academicLevel: AcademicLevel;
   school: SchoolRecord;
   undergraduate: UGRecord[];

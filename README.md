@@ -1,88 +1,89 @@
 # AcademiaFlow
 
-Master Your Academic Journey & Student Productivity. AcademiaFlow is a highly optimized, fully static, offline-first Progressive Web App (PWA) designed to help high-performers track their academic trajectory across all educational levels while simultaneously managing their productivity.
+Master Your Academic Journey & Student Productivity. AcademiaFlow is a comprehensive, static, offline-first web application designed to help students track their academic progress across various educational levels and manage their daily productivity.
 
 ## Project Overview & Architecture
 
-AcademiaFlow is built natively on Next.js 14 (App Router) and Tailwind CSS. It is architected as a **Zero-Backend Application**:
-- **Offline-First Storage:** State is persisted entirely in the browser's `localStorage`. No databases, no cloud authentication, no tracking. Total privacy.
-- **PWA Capabilities:** Complete Service Worker integration allows the application to be installed on any device (iOS, Android, Desktop) like a native app.
-- **Data Portability:** Extensive, detailed JSON and CSV export/import functionality allows users to seamlessly backup and migrate their data across devices manually.
-- **Mobile-App UI:** Features a bottom navigation bar layout for mobile devices, maximizing usability and mimicking a true native mobile experience.
+AcademiaFlow is a Next.js application built with the App Router. It is designed as a zero-backend, fully static web app that operates entirely in the browser.
 
-### Core Features
-- **School (Grades 1-12):** Manage multiple exam instances (e.g. Mid-Terms, Finals) per grade, with infinite subjects and automated percentage calculators.
-- **Undergraduate & Postgraduate:** Create multiple degrees simultaneously. Dynamically unlocks 6, 8, 10, or 12 semesters based on duration. Calculates current and estimated final percentage dynamically.
-- **Doctorate (Ph.D.):** Log coursework CGPA, defense status, and track unlimited publications, conferences, and journal papers with DOI links.
-- **Productivity Suite:** Two-pane productivity dashboard. An interactive To-Do list with priorities/deadlines, and a separate "Quick Notes" section for drafting ideas.
+**Key Features:**
+- **Multi-Level Grade Tracking:** Calculate and track grades for School (Grades 1-12), Undergraduate (Bachelor's), Postgraduate (Master's), and Doctorate (Ph.D.).
+- **Productivity Suite:** Manage daily tasks with a prioritized To-Do list and track exam revision progress with a custom study checklist.
+- **Offline-First & Local Storage:** All data is saved automatically and instantly to your browser's local storage. No accounts, no backend databases.
+- **Import / Export System:** Easily backup your entire academic and productivity record to a local JSON file, and restore it on any device.
+- **PWA Ready:** Install AcademiaFlow directly to your device's home screen for a native app-like experience.
 
----
+## Folder Structure Guide
 
-## Detailed Customization & Editing Guide
-
-AcademiaFlow is structured intuitively so any developer can extend or modify it safely without causing merge conflicts.
-
-### 1. Folder Structure Breakdown
 ```
-├── public/
-│   ├── assets/icons/       # Source SVG logos and sharp generated icons
-│   ├── sw.js               # Service Worker for PWA functionality
-│   └── site.webmanifest    # Web app manifest defining standalone UI behavior
+├── public/                 # Static assets (icons, manifest, service worker)
 ├── src/
-│   ├── app/
-│   │   ├── layout.tsx      # Root layout, ThemeProvider, and ServiceWorker registration
-│   │   ├── page.tsx        # Main entry point; manages the Bottom Navigation state and tab rendering
-│   │   └── globals.css     # Global Tailwind CSS and custom keyframe animations
-│   ├── components/         # Reusable UI Modules
-│   │   ├── Navbar.tsx      # Header with PWA install prompts and Dark mode toggle
-│   │   ├── BottomNav.tsx   # Mobile-app style navigation controller
-│   │   ├── Preloader.tsx   # Intro animation (shown once per session)
-│   │   ├── ProductivitySuite.tsx # Tasks and Quick notes implementation
-│   │   ├── SaveControl.tsx # The entire Data tab logic (JSON/CSV Export, Import)
-│   │   └── *Calculator.tsx # The 4 independent academic calculators
-│   ├── lib/
-│   │   └── utils.ts        # Helper functions (cn) and INITIAL_ACADEMIC_STATE
-│   └── types/
-│       └── academic.ts     # Core TypeScript schema definitions.
+│   ├── app/                # Next.js App Router pages and layout
+│   │   ├── layout.tsx      # Root layout, theme provider, service worker registration
+│   │   ├── page.tsx        # Main application dashboard
+│   │   └── globals.css     # Global Tailwind CSS styles
+│   ├── components/         # Reusable React UI components
+│   │   ├── Navbar.tsx      # Header, Theme Toggle, PWA Install logic
+│   │   ├── SaveControl.tsx # Import/Export JSON data management
+│   │   ├── ...             # Various calculator and productivity components
+│   ├── lib/                # Utility functions
+│   │   └── utils.ts        # Helper methods and initial state definitions
+│   └── types/              # TypeScript type definitions
+│       └── academic.ts     # Core data interfaces for the application state
 ```
 
-### 2. How to Add a New Field to a Calculator
-If you want to add a new field (e.g. "Teacher Name") to the School component:
-1. **Update the Type**: Go to `src/types/academic.ts` and add `teacherName: string;` to the `SchoolExam` interface.
-2. **Update Initial State**: Go to `src/lib/utils.ts` and add `teacherName: ""` inside the `SchoolExam` objects within `INITIAL_ACADEMIC_STATE`.
-3. **Update UI**: Go to `src/components/SchoolCalculator.tsx`, locate the `grid` where inputs are rendered, and add a new input. Hook it up using `onChange={(e) => handleUpdateExam(exam.id, "teacherName", e.target.value)}`.
-4. **Update CSV Export**: Go to `src/components/SaveControl.tsx`, locate the `handleExportCSV` function, and append the new `teacherName` to the School CSV headers and data rows.
+## Customization Guide
 
-### 3. How to Modify the Design/Theme
-- The app uses standard **Tailwind CSS**. Open `src/app/globals.css` to modify core variables.
-- We rely extensively on Tailwind's dark mode via the `dark:` prefix.
-- Primary theme color is `emerald-500` to `teal-700`. To change this, perform a global find-and-replace for `emerald` and `teal` to your desired Tailwind color palettes (e.g., `blue`, `indigo`).
+AcademiaFlow is built to be easily customizable:
 
----
+1.  **Editing Theme Colors:** Modify the Tailwind CSS utility classes in your components or adjust the root variables in `src/app/globals.css`.
+2.  **Adjusting Grading Schemes:** The logic for SGPA/CGPA calculations is contained within the respective calculator components (e.g., `src/components/UGCalculator.tsx`). You can edit the math or grading scales directly in these files.
+3.  **Adding New Academic Levels:**
+    - Add a new level to the `AcademicLevel` type in `src/types/academic.ts`.
+    - Create a new component for it in `src/components/`.
+    - Update `src/app/page.tsx` to render your new component when the level is selected.
 
-## Data Schema & Portability
+## Data Schema
 
-Because AcademiaFlow has no database, users maintain ownership of their data. The application uses a complex nested JSON structure defined by `AcademiaFlowState` in `src/types/academic.ts`.
+When you export your data, AcademiaFlow generates a JSON file. The root structure follows the `AcademiaFlowState` interface found in `src/types/academic.ts`:
 
-The `SaveControl.tsx` file handles parsing this massive object. When a user clicks "Export CSV", the application safely flattens these arrays into standard comma-separated values so students can visualize their trajectory in Excel or Google Sheets.
-
----
+```json
+{
+  "academicLevel": "undergraduate",
+  "school": { ... },
+  "undergraduate": {
+    "degreeName": "B.Tech",
+    "collegeName": "University",
+    "durationYears": 4,
+    "semesters": [ ... ]
+  },
+  "postgraduate": { ... },
+  "doctorate": { ... },
+  "todos": [
+    {
+      "id": "t-12345",
+      "title": "Finish Assignment",
+      "deadline": "2026-05-10",
+      "completed": false,
+      "priority": "high"
+    }
+  ],
+  "revisions": [ ... ]
+}
+```
 
 ## Cloudflare Pages Deployment Guide
 
-AcademiaFlow is optimized to be deployed instantly on Cloudflare Pages without any build configuration errors. It uses the `output: 'export'` feature of Next.js to compile to entirely static files.
+AcademiaFlow is optimized for direct static deployment on Cloudflare Pages.
 
-1.  Push your customized repository to your GitHub account.
-2.  Log in to the [Cloudflare Dashboard](https://dash.cloudflare.com/) and navigate to **Workers & Pages**.
-3.  Click **Create application** -> **Pages** -> **Connect to Git**.
-4.  Select your repository.
-5.  **Build Settings:**
-    - Framework preset: `Next.js (Static HTML Export)`
-    - Build command: `npm run build`
-    - Build output directory: `out`
-6.  Click **Save and Deploy**.
-
-Your site is now live globally, edge-cached, and fully offline-capable.
+1.  Push this repository to your GitHub account.
+2.  Log in to the [Cloudflare Dashboard](https://dash.cloudflare.com/) and navigate to **Workers & Pages** -> **Create application** -> **Pages** -> **Connect to Git**.
+3.  Select your GitHub repository.
+4.  Configure the build settings:
+    - **Framework preset:** Next.js (Static HTML Export)
+    - **Build command:** `npm run build`
+    - **Build output directory:** `out`
+5.  Click **Save and Deploy**. Cloudflare will automatically build and deploy your static application globally.
 
 ---
 *Powered by [Saamio](https://saamio.com)*
