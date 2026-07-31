@@ -30,33 +30,32 @@ export function Preloader() {
       <div className="absolute top-0 right-0 -mt-20 -mr-20 w-96 h-96 bg-emerald-500/20 rounded-full blur-[100px] pointer-events-none"></div>
       <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-96 h-96 bg-teal-500/20 rounded-full blur-[100px] pointer-events-none"></div>
 
-      <div className="relative z-10 flex flex-col items-center text-center max-w-3xl px-6 space-y-6">
-        <div className="h-20 w-20 rounded-3xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center shadow-2xl shadow-emerald-500/40 mb-4 animate-bounce">
-          <span className="font-extrabold text-5xl font-montserrat tracking-tighter">A</span>
+      <div className="relative z-10 flex flex-col items-center text-center px-6 mt-[-10vh]">
+        <div className="h-24 w-24 rounded-3xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center shadow-2xl shadow-emerald-500/40 mb-8 animate-pulse">
+          <span className="font-extrabold text-6xl font-montserrat tracking-tighter">A</span>
         </div>
 
-        <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-sm font-bold uppercase tracking-wider">
-          <Zap className="w-4 h-4" /> Unleash Your Potential
-        </span>
-
-        <h1 className="text-4xl sm:text-6xl font-black font-montserrat tracking-tight leading-tight">
-          Engineer Your Success with Elite Focus.
+        <h1 className="text-2xl font-bold font-montserrat tracking-tight leading-tight text-white mb-4">
+          Master Your Academic Journey & Student Productivity.
         </h1>
 
-        <p className="text-lg sm:text-xl text-slate-300 max-w-2xl">
-          Built for high-performers. Turn your academic trajectory into actionable data. Track, optimize, and dominate every degree program with absolute privacy and precision.
-        </p>
-
-        <button
-          onClick={dismiss}
-          className="mt-8 group flex items-center gap-2 px-8 py-3 rounded-2xl bg-white text-slate-950 font-bold text-sm hover:bg-emerald-50 transition-all hover:scale-105"
-        >
-          Skip Intro <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-        </button>
+        <div className="flex items-center justify-center gap-2 mt-4 text-emerald-400">
+           <svg className="animate-spin h-5 w-5 text-emerald-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span className="text-xs font-medium uppercase tracking-widest text-emerald-400/80">Loading Workspace...</span>
+        </div>
       </div>
 
-      <div className="absolute bottom-10 w-48 h-1 bg-slate-800 rounded-full overflow-hidden">
-        <div className="h-full bg-emerald-500 rounded-full w-full animate-[shrink_5s_linear_forwards]"></div>
+      <div className="absolute bottom-12 flex flex-col items-center gap-2">
+        <span className="text-[10px] text-slate-500 font-medium">Powered by Saamio</span>
+        <button
+          onClick={dismiss}
+          className="text-[11px] font-semibold text-slate-400 hover:text-white transition-colors"
+        >
+          Skip Intro
+        </button>
       </div>
     </div>
   );
