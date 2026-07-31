@@ -98,28 +98,7 @@ export function Navbar() {
           {/* Right Action Bar */}
           <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto justify-end mt-2 sm:mt-0">
 
-            {/* Theme Toggle */}
-            {mounted && (
-              <button
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all min-w-[44px] min-h-[44px] flex items-center justify-center"
-                aria-label="Toggle Theme"
-              >
-                {theme === "dark" ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
-              </button>
-            )}
 
-            {/* Persistent Install Button (if banner dismissed but still installable) */}
-            {isInstallable && !showBanner && (
-              <button
-                onClick={handleInstallClick}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 text-xs font-semibold text-emerald-700 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900/50 transition-colors min-w-[44px] min-h-[44px] justify-center"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Install App</span>
-              </button>
-            )}
-          </div>
         </div>
       </div>
     </header>

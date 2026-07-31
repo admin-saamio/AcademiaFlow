@@ -149,6 +149,20 @@ export function SchoolCalculator({ data, onChange }: SchoolCalculatorProps) {
               >
                 <Trash2 className="w-4 h-4" />
               </button>
+      {/* Subject Marks Entry Table */}
+      <div className="bg-slate-50 dark:bg-slate-800/40 p-5 rounded-2xl border border-slate-200 dark:border-slate-700/60 space-y-4 overflow-x-auto max-w-full">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <h4 className="font-bold text-slate-900 dark:text-white text-base flex items-center gap-2">
+            <Award className="w-5 h-5 text-emerald-500" />
+            Subject Breakdown & Marks Entry
+          </h4>
+          <button
+            onClick={handleAddSubject}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-md shadow-emerald-600/20 transition-all min-h-[44px]"
+          >
+            <Plus className="w-4 h-4" /> Add Subject
+          </button>
+        </div>
 
               {/* Overview & Form Header */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pr-10">
@@ -216,6 +230,14 @@ export function SchoolCalculator({ data, onChange }: SchoolCalculatorProps) {
                   <div className="bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10">
                     <span className="block text-xs text-emerald-200">Max Marks</span>
                     <span className="text-lg font-bold">{totalMax}</span>
+                  <div className="sm:col-span-1 flex justify-end">
+                    <button
+                      onClick={() => handleRemoveSubject(sub.id)}
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+                      title="Remove Subject"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
               </div>

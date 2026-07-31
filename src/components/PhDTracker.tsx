@@ -128,25 +128,7 @@ export function PhDTracker({ data, onChange }: PhDTrackerProps) {
               <Trash2 className="w-4 h-4" />
             </button>
 
-            {/* Ph.D. Core Details */}
-            <div className="bg-slate-50 dark:bg-slate-800/40 p-5 rounded-2xl border border-slate-200 dark:border-slate-700/60 grid grid-cols-1 md:grid-cols-3 gap-4 pr-10">
-              <div>
-                <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
-                  Coursework CGPA
-                </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  max="10"
-                  value={degree.courseworkCgpa || ""}
-                  onChange={(e) =>
-                    handleInputChange(degree.id, "courseworkCgpa", parseFloat(e.target.value) || 0)
-                  }
-                  placeholder="e.g. 9.80"
-                  className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none font-bold"
-                />
-              </div>
+
 
               <div>
                 <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
@@ -195,14 +177,7 @@ export function PhDTracker({ data, onChange }: PhDTrackerProps) {
                 </div>
               </div>
 
-              <div className="flex items-center gap-4 text-sm">
-                <div className="bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10">
-                  <span className="block text-xs text-emerald-200">Coursework CGPA</span>
-                  <span className="text-lg font-bold">{degree.courseworkCgpa} / 10</span>
-                </div>
-                <div className="bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10">
-                  <span className="block text-xs text-emerald-200">Publications</span>
-                  <span className="text-lg font-bold">{degree.publications.length} Papers</span>
+
                 </div>
               </div>
             </div>

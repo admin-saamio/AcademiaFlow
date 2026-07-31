@@ -3,6 +3,7 @@
 import React, { useState, useRef } from "react";
 import { AcademiaFlowState } from "@/types/academic";
 import { Database, Download, Upload, CheckCircle2, Info, FileSpreadsheet } from "lucide-react";
+import { Database, Download, Upload, CheckCircle2, Info } from "lucide-react";
 import confetti from "canvas-confetti";
 
 interface SaveControlProps {
@@ -23,6 +24,12 @@ export function SaveControl({ state, onImport }: SaveControlProps) {
     const dataStr = JSON.stringify(state, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
     const exportFileDefaultName = `academiaflow-backup-${new Date().toISOString().split('T')[0]}.json`;
+  const handleExport = () => {
+    const dataStr = JSON.stringify(state, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+
+    const exportFileDefaultName = `academiaflow-backup-${new Date().toISOString().split('T')[0]}.json`;
+
     const linkElement = document.createElement('a');
     linkElement.setAttribute('href', dataUri);
     linkElement.setAttribute('download', exportFileDefaultName);
@@ -101,6 +108,46 @@ export function SaveControl({ state, onImport }: SaveControlProps) {
     };
     reader.readAsText(file);
 
+
+    confetti({
+      particleCount: 80,
+      spread: 70,
+      origin: { y: 0.8 },
+    });
+
+    showToast("Data exported successfully!");
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const json = JSON.parse(event.target?.result as string);
+        if (json && json.academicLevel) {
+          onImport(json);
+          confetti({
+            particleCount: 100,
+            spread: 80,
+            origin: { y: 0.8 },
+          });
+          showToast("Data imported successfully!");
+        } else {
+          showToast("Invalid backup file format.");
+        }
+      } catch (err) {
+        console.error(err);
+        showToast("Error parsing backup file.");
+      }
+    };
+    reader.readAsText(file);
+
     // Reset file input
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -134,6 +181,7 @@ export function SaveControl({ state, onImport }: SaveControlProps) {
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 Export or import your academic records.
               </p>
+
             </div>
           </div>
 
@@ -154,22 +202,13 @@ export function SaveControl({ state, onImport }: SaveControlProps) {
               Import Data
             </button>
 
-            <div className="flex gap-2 w-full sm:w-auto">
-              <button
-                onClick={handleExportJSON}
-                className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-md shadow-emerald-600/20 transition-all flex items-center justify-center gap-2 min-h-[44px]"
-              >
-                <Download className="w-4 h-4" />
-                Export JSON
-              </button>
-              <button
-                onClick={handleExportCSV}
-                className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold text-sm shadow-md shadow-teal-600/20 transition-all flex items-center justify-center gap-2 min-h-[44px]"
-              >
-                <FileSpreadsheet className="w-4 h-4" />
-                Export CSV
-              </button>
-            </div>
+            <button
+              onClick={handleExport}
+              className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-md shadow-emerald-600/20 transition-all flex items-center justify-center gap-2 min-h-[44px]"
+            >
+              <Download className="w-4 h-4" />
+              Export Data
+            </button>
           </div>
         </div>
 
@@ -180,6 +219,7 @@ export function SaveControl({ state, onImport }: SaveControlProps) {
             <strong>Your data is saved automatically in your browser.</strong> Export your data to back it up or transfer it to another device.
           </p>
         </div>
+
 
       </div>
     </div>
