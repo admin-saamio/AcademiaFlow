@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Montserrat, Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import { AuthProvider } from "@/context/AuthContext";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -17,11 +16,45 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "AcademicTracker. | Student Grade & Productivity Platform",
-  description: "Comprehensive, responsive academic record tracking and student productivity web application. Calculate School, UG, PG, Ph.D. marks with Firebase cloud synchronization.",
-  keywords: ["Academic Tracker", "GPA Calculator", "CGPA Calculator", "Student Productivity", "Study Revision Checklist", "Firebase Record Sync"],
-  authors: [{ name: "AcademicTracker Team" }],
+  title: "AcademiaFlow | Student Grade & Productivity Platform",
+  description: "Comprehensive, responsive academic record tracking and student productivity web application. Calculate School, UG, PG, Ph.D. marks locally.",
+  keywords: ["AcademiaFlow", "Academic Tracker", "GPA Calculator", "CGPA Calculator", "Student Productivity", "Study Revision Checklist"],
+  authors: [{ name: "AcademiaFlow Team" }],
+  icons: {
+    icon: [
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+  },
+  manifest: '/site.webmanifest',
+  openGraph: {
+    title: "AcademiaFlow | Student Grade & Productivity Platform",
+    description: "Master your academic journey with offline-first tracking for school, college, and PhD.",
+    url: "https://academiaflow.com",
+    siteName: "AcademiaFlow",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "AcademiaFlow Preview",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "AcademiaFlow | Student Grade & Productivity Platform",
+    description: "Master your academic journey with offline-first tracking for school, college, and PhD.",
+    images: ["/og-image.png"],
+  },
 };
+
+import Script from "next/script";
 
 export default function RootLayout({
   children,
@@ -30,12 +63,23 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className={`${montserrat.variable} ${inter.variable}`}>
-      <body className="font-sans antialiased bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen selection:bg-emerald-500 selection:text-white transition-colors">
-        <AuthProvider>
-          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-            {children}
-          </ThemeProvider>
-        </AuthProvider>
+      <body className="font-sans antialiased bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen selection:bg-emerald-500 selection:text-white transition-colors pb-10 sm:pb-0">
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+          {children}
+        </ThemeProvider>
+        <Script id="sw-register" strategy="afterInteractive">
+          {`
+            if ('serviceWorker' in navigator) {
+              window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                  console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, function(err) {
+                  console.log('ServiceWorker registration failed: ', err);
+                });
+              });
+            }
+          `}
+        </Script>
       </body>
     </html>
   );
