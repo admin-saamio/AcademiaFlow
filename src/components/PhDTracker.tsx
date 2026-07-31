@@ -137,7 +137,7 @@ export function PhDTracker({ data, onChange }: PhDTrackerProps) {
           </h4>
           <button
             onClick={handleAddPublication}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-md shadow-emerald-600/20 transition-all"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-md shadow-emerald-600/20 transition-all min-h-[44px]"
           >
             <Plus className="w-4 h-4" /> Add Publication
           </button>
@@ -215,7 +215,7 @@ export function PhDTracker({ data, onChange }: PhDTrackerProps) {
                   </div>
                   <button
                     onClick={() => handleRemovePublication(pub.id)}
-                    className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors"
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>

@@ -139,7 +139,7 @@ export function PGCalculator({ data, onChange }: PGCalculatorProps) {
       </div>
 
       {/* Semester SGPA Input Boxes */}
-      <div className="bg-slate-50 dark:bg-slate-800/40 p-5 rounded-2xl border border-slate-200 dark:border-slate-700/60 space-y-4">
+      <div className="bg-slate-50 dark:bg-slate-800/40 p-5 rounded-2xl border border-slate-200 dark:border-slate-700/60 space-y-4 overflow-x-auto max-w-full">
         <h4 className="font-bold text-slate-900 dark:text-white text-base flex items-center gap-2">
           <Layers className="w-5 h-5 text-emerald-500" />
           Semester SGPA Entries ({data.semesters.length} Unlocked Boxes)

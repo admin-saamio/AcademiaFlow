@@ -71,7 +71,7 @@ export interface RevisionCheckitem {
   completed: boolean;
 }
 
-export interface AcademicTrackerState {
+export interface AcademiaFlowState {
   academicLevel: AcademicLevel;
   school: SchoolRecord;
   undergraduate: UGRecord;
