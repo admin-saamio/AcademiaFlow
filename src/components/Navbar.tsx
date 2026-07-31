@@ -120,17 +120,6 @@ export function Navbar() {
           {/* Right Action Bar */}
           <div className="flex items-center gap-2 sm:gap-3 justify-end">
 
-            {/* Theme Toggle */}
-            {mounted && (
-              <button
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="p-2 sm:p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all flex items-center justify-center shrink-0 w-[40px] h-[40px] sm:w-[44px] sm:h-[44px]"
-                aria-label="Toggle Theme"
-              >
-                {theme === "dark" ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
-              </button>
-            )}
-
             {/* Contact Button */}
             <a
               href="https://saamio.com/contact/"
