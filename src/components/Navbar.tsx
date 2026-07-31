@@ -83,43 +83,22 @@ export function Navbar() {
       )}
     <header className="sticky top-0 z-50 w-full backdrop-blur-md bg-white/80 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 gap-2">
+        <div className="flex flex-wrap items-center justify-between h-auto py-3 sm:py-0 sm:h-16 gap-4">
           
           {/* Brand Logo */}
           <div className="flex items-center gap-2">
             <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center text-white font-bold text-lg sm:text-xl shadow-md shadow-emerald-500/20 shrink-0">
               A
             </div>
-            <span className="font-extrabold text-lg sm:text-2xl tracking-tight text-slate-900 dark:text-white font-montserrat shrink-0">
+            <span className="font-extrabold text-xl sm:text-2xl tracking-tight text-slate-900 dark:text-white font-montserrat">
               AcademiaFlow<span className="text-emerald-500 font-extrabold">.</span>
             </span>
           </div>
 
           {/* Right Action Bar */}
-          <div className="flex items-center gap-2 sm:gap-3 justify-end">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto justify-end mt-2 sm:mt-0">
 
-            {/* Theme Toggle */}
-            {mounted && (
-              <button
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="p-2 sm:p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all flex items-center justify-center shrink-0 w-[40px] h-[40px] sm:w-[44px] sm:h-[44px]"
-                aria-label="Toggle Theme"
-              >
-                {theme === "dark" ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
-              </button>
-            )}
 
-            {/* Persistent Install Button (if banner dismissed but still installable) */}
-            {isInstallable && !showBanner && (
-              <button
-                onClick={handleInstallClick}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 text-xs font-semibold text-emerald-700 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900/50 transition-colors h-[40px] sm:h-[44px] justify-center shrink-0"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Install App</span>
-              </button>
-            )}
-          </div>
         </div>
       </div>
     </header>
