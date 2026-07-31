@@ -15,8 +15,8 @@ export interface SemesterData {
   subjects: SubjectMarks[];
 }
 
-export interface SchoolRecord {
-  grade: string; // e.g. "Grade 10"
+export interface SchoolExam {
+  id: string;
   examName: string;
   institutionName: string;
   cityCountry: string;
@@ -24,7 +24,13 @@ export interface SchoolRecord {
   subjects: SubjectMarks[];
 }
 
+export interface SchoolRecord {
+  grade: string; // currently selected grade
+  examsByGrade: Record<string, SchoolExam[]>; // e.g. { "Grade 10": [SchoolExam] }
+}
+
 export interface UGRecord {
+  id: string;
   degreeName: string; // e.g. "B.Tech", "B.Sc"
   collegeName: string;
   cityCountry: string;
@@ -33,6 +39,7 @@ export interface UGRecord {
 }
 
 export interface PGRecord {
+  id: string;
   degreeName: string; // e.g. "M.Tech", "M.Sc", "MBA"
   universityName: string;
   durationYears: number; // 1, 2, 3
@@ -49,6 +56,7 @@ export interface PublicationItem {
 }
 
 export interface PhDRecord {
+  id: string;
   courseworkCgpa: number;
   thesisTitle: string;
   defenseStatus: 'Enrolled' | 'Submitted' | 'Awarded';
@@ -74,10 +82,11 @@ export interface RevisionCheckitem {
 export interface AcademiaFlowState {
   academicLevel: AcademicLevel;
   school: SchoolRecord;
-  undergraduate: UGRecord;
-  postgraduate: PGRecord;
-  doctorate: PhDRecord;
+  undergraduate: UGRecord[];
+  postgraduate: PGRecord[];
+  doctorate: PhDRecord[];
   todos: TodoItem[];
   revisions: RevisionCheckitem[];
+  notes: NoteItem[];
   lastSavedAt?: string;
 }

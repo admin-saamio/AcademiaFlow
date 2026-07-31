@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from "react";
 import { AcademiaFlowState } from "@/types/academic";
+import { Database, Download, Upload, CheckCircle2, Info, FileSpreadsheet } from "lucide-react";
 import { Database, Download, Upload, CheckCircle2, Info } from "lucide-react";
 import confetti from "canvas-confetti";
 
@@ -19,6 +20,10 @@ export function SaveControl({ state, onImport }: SaveControlProps) {
     setTimeout(() => setToastMessage(null), 4500);
   };
 
+  const handleExportJSON = () => {
+    const dataStr = JSON.stringify(state, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    const exportFileDefaultName = `academiaflow-backup-${new Date().toISOString().split('T')[0]}.json`;
   const handleExport = () => {
     const dataStr = JSON.stringify(state, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
@@ -29,6 +34,80 @@ export function SaveControl({ state, onImport }: SaveControlProps) {
     linkElement.setAttribute('href', dataUri);
     linkElement.setAttribute('download', exportFileDefaultName);
     linkElement.click();
+
+    confetti({ particleCount: 80, spread: 70, origin: { y: 0.8 } });
+    showToast("JSON Data exported successfully!");
+  };
+
+  const handleExportCSV = () => {
+    // Generate a simple CSV representation of School & UG degrees as an example
+    let csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += "Type,Degree/Grade,Name,Institution,Duration/Completion Year\n";
+
+    // Add School
+    Object.entries(state.school.examsByGrade).forEach(([grade, exams]) => {
+      exams.forEach(exam => {
+        csvContent += `"School","${grade}","${exam.examName}","${exam.institutionName}","${exam.yearOfCompletion}"\n`;
+      });
+    });
+
+    // Add UG
+    state.undergraduate.forEach(ug => {
+      csvContent += `"Undergraduate","N/A","${ug.degreeName}","${ug.collegeName}","${ug.durationYears} Years"\n`;
+    });
+
+    // Add PG
+    state.postgraduate.forEach(pg => {
+      csvContent += `"Postgraduate","N/A","${pg.degreeName}","${pg.universityName}","${pg.durationYears} Years"\n`;
+    });
+
+    // Add PhD
+    state.doctorate.forEach(phd => {
+      csvContent += `"Doctorate","N/A","${phd.thesisTitle}","N/A","${phd.defenseStatus}"\n`;
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `academiaflow-export-${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    confetti({ particleCount: 80, spread: 70, origin: { y: 0.8 } });
+    showToast("CSV exported successfully!");
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const json = JSON.parse(event.target?.result as string);
+        if (json && json.academicLevel) {
+          onImport(json);
+          confetti({
+            particleCount: 100,
+            spread: 80,
+            origin: { y: 0.8 },
+          });
+          showToast("Data imported successfully!");
+        } else {
+          showToast("Invalid backup file format.");
+        }
+      } catch (err) {
+        console.error(err);
+        showToast("Error parsing backup file.");
+      }
+    };
+    reader.readAsText(file);
+
 
     confetti({
       particleCount: 80,
@@ -102,6 +181,7 @@ export function SaveControl({ state, onImport }: SaveControlProps) {
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 Export or import your academic records.
               </p>
+
             </div>
           </div>
 
@@ -139,6 +219,7 @@ export function SaveControl({ state, onImport }: SaveControlProps) {
             <strong>Your data is saved automatically in your browser.</strong> Export your data to back it up or transfer it to another device.
           </p>
         </div>
+
 
       </div>
     </div>

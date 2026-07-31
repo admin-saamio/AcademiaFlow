@@ -1,22 +1,29 @@
 "use client";
 
 import React, { useState } from "react";
-import { TodoItem, RevisionCheckitem, PriorityLevel } from "@/types/academic";
-import { CheckSquare, Calendar, Plus, Trash2, CheckCircle2, Clock, AlertCircle, BookOpenCheck } from "lucide-react";
+import { TodoItem, RevisionCheckitem, NoteItem, PriorityLevel } from "@/types/academic";
+import { CheckSquare, Calendar, Plus, Trash2, CheckCircle2, BookOpenCheck, Edit3, Save } from "lucide-react";
 
 interface ProductivitySuiteProps {
   todos: TodoItem[];
   revisions: RevisionCheckitem[];
+  notes: NoteItem[];
   onUpdateTodos: (todos: TodoItem[]) => void;
   onUpdateRevisions: (revisions: RevisionCheckitem[]) => void;
+  onUpdateNotes: (notes: NoteItem[]) => void;
 }
 
 export function ProductivitySuite({
   todos,
   revisions,
+  notes,
   onUpdateTodos,
   onUpdateRevisions,
+  onUpdateNotes,
 }: ProductivitySuiteProps) {
+  const [activeTab, setActiveTab] = useState<"tasks" | "notes">("tasks");
+  const [savedMessage, setSavedMessage] = useState<string | null>(null);
+
   // To-Do Form State
   const [newTodoTitle, setNewTodoTitle] = useState("");
   const [newTodoDeadline, setNewTodoDeadline] = useState("");
@@ -24,6 +31,11 @@ export function ProductivitySuite({
 
   // Revision Form State
   const [newRevisionTitle, setNewRevisionTitle] = useState("");
+
+  // Notes Form State
+  const [newNoteTitle, setNewNoteTitle] = useState("");
+  const [newNoteContent, setNewNoteContent] = useState("");
+  const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
 
   // Add To-Do Item
   const handleAddTodo = (e: React.FormEvent) => {
@@ -80,30 +92,110 @@ export function ProductivitySuite({
     onUpdateRevisions(revisions.filter((r) => r.id !== id));
   };
 
+  const handleSaveNote = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newNoteTitle.trim() || !newNoteContent.trim()) return;
+
+    if (editingNoteId) {
+      const updatedNotes = notes.map(n =>
+        n.id === editingNoteId ? { ...n, title: newNoteTitle, content: newNoteContent, updatedAt: new Date().toISOString() } : n
+      );
+      onUpdateNotes(updatedNotes);
+      setEditingNoteId(null);
+    } else {
+      const newNote: NoteItem = {
+        id: `n-${Date.now()}`,
+        title: newNoteTitle.trim(),
+        content: newNoteContent.trim(),
+        updatedAt: new Date().toISOString()
+      };
+      onUpdateNotes([newNote, ...notes]);
+    }
+
+    setNewNoteTitle("");
+    setNewNoteContent("");
+  };
+
+  const handleEditNote = (note: NoteItem) => {
+    setEditingNoteId(note.id);
+    setNewNoteTitle(note.title);
+    setNewNoteContent(note.content);
+  };
+
+  const handleDeleteNote = (id: string) => {
+    onUpdateNotes(notes.filter(n => n.id !== id));
+    if (editingNoteId === id) {
+      setEditingNoteId(null);
+      setNewNoteTitle("");
+      setNewNoteContent("");
+    }
+  };
+
   // Revision Progress Calculation
   const completedRevisions = revisions.filter((r) => r.completed).length;
   const revisionProgressPercent =
     revisions.length > 0 ? Math.round((completedRevisions / revisions.length) * 100) : 0;
 
+  const handleSaveLocally = () => {
+    setSavedMessage("Saved Productivity Data!");
+    setTimeout(() => setSavedMessage(null), 3000);
+  };
+
   return (
     <section className="w-full bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl shadow-slate-200/50 dark:shadow-none space-y-8">
-      <div className="flex items-center gap-3">
-        <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400">
-          <BookOpenCheck className="w-6 h-6" />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400">
+            <BookOpenCheck className="w-6 h-6" />
+          </div>
+          <div>
+            <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white font-montserrat">
+              Student Productivity Suite
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+              Organize deadlines, assignments, and quick notes.
+            </p>
+          </div>
         </div>
-        <div>
-          <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white font-montserrat">
-            Student Productivity Suite
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-            Organize daily deadlines, homework assignments, and exam revision targets.
-          </p>
-        </div>
+
+        <button
+          onClick={handleSaveLocally}
+          className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm shadow-md shadow-emerald-600/20 transition-all min-h-[44px]"
+        >
+          <Save className="w-4 h-4" /> Save
+        </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* 1. INTERACTIVE TO-DO LIST */}
-        <div className="bg-slate-50/70 dark:bg-slate-800/40 p-5 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-700/60 flex flex-col justify-between space-y-4">
+      {savedMessage && (
+        <div className="bg-emerald-50 text-emerald-600 px-4 py-2 rounded-xl border border-emerald-200 text-sm font-semibold animate-in fade-in">
+          ✓ {savedMessage}
+        </div>
+      )}
+
+      {/* Tabs */}
+      <div className="flex border-b border-slate-200 dark:border-slate-800">
+        <button
+          onClick={() => setActiveTab("tasks")}
+          className={`px-6 py-3 font-semibold text-sm transition-colors border-b-2 ${
+            activeTab === "tasks" ? "border-emerald-500 text-emerald-600 dark:text-emerald-400" : "border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+          }`}
+        >
+          Tasks & Revisions
+        </button>
+        <button
+          onClick={() => setActiveTab("notes")}
+          className={`px-6 py-3 font-semibold text-sm transition-colors border-b-2 ${
+            activeTab === "notes" ? "border-emerald-500 text-emerald-600 dark:text-emerald-400" : "border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+          }`}
+        >
+          Quick Notes
+        </button>
+      </div>
+
+      {activeTab === "tasks" && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-in fade-in slide-in-from-bottom-2">
+          {/* 1. INTERACTIVE TO-DO LIST */}
+          <div className="bg-slate-50/70 dark:bg-slate-800/40 p-5 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-700/60 flex flex-col justify-between space-y-4">
           <div>
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
@@ -313,6 +405,84 @@ export function ProductivitySuite({
           </div>
         </div>
       </div>
+      )}
+
+      {activeTab === "notes" && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in slide-in-from-bottom-2">
+          {/* Add/Edit Note Form */}
+          <div className="lg:col-span-1 bg-slate-50/70 dark:bg-slate-800/40 p-5 rounded-2xl border border-slate-200 dark:border-slate-700/60 space-y-4">
+            <h3 className="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2 mb-4">
+              <Edit3 className="w-5 h-5 text-emerald-500" />
+              {editingNoteId ? "Edit Note" : "New Quick Note"}
+            </h3>
+            <form onSubmit={handleSaveNote} className="space-y-4">
+              <input
+                type="text"
+                value={newNoteTitle}
+                onChange={(e) => setNewNoteTitle(e.target.value)}
+                placeholder="Note Title"
+                className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-sm font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+              />
+              <textarea
+                value={newNoteContent}
+                onChange={(e) => setNewNoteContent(e.target.value)}
+                placeholder="Write your note here..."
+                rows={6}
+                className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none resize-none"
+              ></textarea>
+              <button
+                type="submit"
+                className="w-full py-2 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-md shadow-emerald-600/20 transition-all min-h-[44px]"
+              >
+                <Save className="w-4 h-4" /> {editingNoteId ? "Update Note" : "Save Note"}
+              </button>
+              {editingNoteId && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingNoteId(null);
+                    setNewNoteTitle("");
+                    setNewNoteContent("");
+                  }}
+                  className="w-full py-2 px-4 rounded-xl border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 font-semibold text-sm hover:bg-slate-100 dark:hover:bg-slate-800 transition-all min-h-[44px]"
+                >
+                  Cancel Edit
+                </button>
+              )}
+            </form>
+          </div>
+
+          {/* Notes List */}
+          <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 auto-rows-max">
+            {notes.length === 0 ? (
+              <div className="sm:col-span-2 text-center py-10 bg-slate-50 dark:bg-slate-800/40 rounded-3xl border border-slate-200 dark:border-slate-700 border-dashed">
+                <Edit3 className="w-10 h-10 mx-auto text-slate-400 mb-2" />
+                <p className="text-slate-500 font-medium">No notes saved yet.</p>
+              </div>
+            ) : (
+              notes.map((note) => (
+                <div key={note.id} className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 shadow-sm flex flex-col h-full">
+                  <div className="flex justify-between items-start mb-2 gap-2">
+                    <h4 className="font-bold text-slate-900 dark:text-white text-sm line-clamp-2">{note.title}</h4>
+                    <div className="flex shrink-0">
+                      <button onClick={() => handleEditNote(note)} className="p-1 text-slate-400 hover:text-emerald-500 min-w-[32px] min-h-[32px] flex items-center justify-center">
+                        <Edit3 className="w-3.5 h-3.5" />
+                      </button>
+                      <button onClick={() => handleDeleteNote(note.id)} className="p-1 text-slate-400 hover:text-red-500 min-w-[32px] min-h-[32px] flex items-center justify-center">
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 mb-4 whitespace-pre-wrap flex-1">{note.content}</p>
+                  <div className="text-[10px] text-slate-400 mt-auto pt-3 border-t border-slate-100 dark:border-slate-800">
+                    Updated: {new Date(note.updatedAt).toLocaleDateString()}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
     </section>
   );
 }
