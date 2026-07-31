@@ -82,7 +82,7 @@ export function AcademicLevelSelector({
             )}
           </div>
           <h3 className="font-bold text-lg text-slate-900 dark:text-white font-montserrat">
-            Undergraduate (Bachelor's)
+            Undergraduate (Bachelor&apos;s)
           </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
             B.Tech, B.Sc, B.Com multi-year semester SGPA & cumulative CGPA logic.
@@ -109,10 +109,10 @@ export function AcademicLevelSelector({
             )}
           </div>
           <h3 className="font-bold text-lg text-slate-900 dark:text-white font-montserrat">
-            Postgraduate (Master's)
+            Postgraduate (Master&apos;s)
           </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            M.Tech, M.Sc, MBA credit structures & Master's thesis evaluation.
+            M.Tech, M.Sc, MBA credit structures & Master&apos;s thesis evaluation.
           </p>
         </div>
 
@@ -146,32 +146,27 @@ export function AcademicLevelSelector({
 
       {/* Sub-selector for School Grades (1 to 12) */}
       {currentLevel === "school" && (
-        <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800 animate-in fade-in slide-in-from-top-3 duration-300">
-          <div className="flex items-center justify-between mb-4">
-            <h4 className="font-semibold text-sm text-slate-900 dark:text-white uppercase tracking-wider">
-              Select Grade (1 through 12):
-            </h4>
-            <span className="text-xs text-emerald-600 dark:text-emerald-400 font-bold">
-              Active: {selectedGrade}
-            </span>
-          </div>
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-2">
-            {grades.map((grade) => {
-              const isSelected = selectedGrade === grade;
-              return (
-                <button
-                  key={grade}
-                  onClick={() => onSelectGrade(grade)}
-                  className={`py-2 px-3 rounded-xl text-xs font-bold transition-all ${
-                    isSelected
-                      ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/30 scale-105"
-                      : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
-                  }`}
-                >
-                  {grade.replace("Grade ", "Gr. ")}
-                </button>
-              );
-            })}
+        <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800 animate-in fade-in slide-in-from-top-3 duration-300 max-w-sm mx-auto sm:mx-0">
+          <label className="block font-semibold text-sm text-slate-900 dark:text-white uppercase tracking-wider mb-2">
+            Select Grade (1 through 12):
+          </label>
+          <div className="relative">
+            <select
+              value={selectedGrade}
+              onChange={(e) => onSelectGrade(e.target.value)}
+              className="w-full appearance-none px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm font-bold focus:ring-2 focus:ring-emerald-500 focus:outline-none min-h-[44px]"
+            >
+              {grades.map((grade) => (
+                <option key={grade} value={grade}>
+                  {grade}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
+              <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
+                <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+              </svg>
+            </div>
           </div>
         </div>
       )}
