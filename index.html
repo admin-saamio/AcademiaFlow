@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AcademiaFlow | Student Grade & Productivity Platform</title>
+    <meta name="description" content="Master your academic journey with offline-first tracking for school, college, and PhD.">
+    <meta name="theme-color" content="#10b981">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@400;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS (CDN for zero-build deployment) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'media', // Uses system preference automatically
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'], montserrat: ['Montserrat', 'sans-serif'] },
+                    animation: { pulse: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' }
+                }
+            }
+        }
+    </script>
+
+    <!-- Dependencies -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+    <style>
+        [x-cloak] { display: none !important; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        @media (prefers-color-scheme: dark) { ::-webkit-scrollbar-thumb { background: #334155; } }
+    </style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans antialiased pb-20 selection:bg-emerald-500 selection:text-white" x-data="academiaFlow">
+
+    <!-- PRELOADER -->
+    <div x-show="showPreloader" x-transition.opacity.duration.500ms class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-slate-950 text-white" x-cloak>
+        <div class="absolute top-0 right-0 -mt-20 -mr-20 w-96 h-96 bg-emerald-500/20 rounded-full blur-[100px] pointer-events-none"></div>
+        <div class="relative z-10 flex flex-col items-center text-center px-6 mt-[-10vh]">
+            <div class="h-24 w-24 rounded-3xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center shadow-2xl shadow-emerald-500/40 mb-8 animate-pulse">
+                <span class="font-extrabold text-6xl font-montserrat tracking-tighter">A</span>
+            </div>
+            <h1 class="text-2xl font-bold font-montserrat tracking-tight leading-tight text-white mb-4">
+                Master Your Academic Journey & Student Productivity.
+            </h1>
+            <div class="flex items-center justify-center gap-2 mt-4 text-emerald-400">
+                <i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i>
+                <span class="text-xs font-medium uppercase tracking-widest text-emerald-400/80">Loading Workspace...</span>
+            </div>
+        </div>
+        <div class="absolute bottom-12 flex flex-col items-center gap-2">
+            <span class="text-[10px] text-slate-500 font-medium">Powered by Saamio</span>
+            <button @click="dismissPreloader()" class="text-[11px] font-semibold text-slate-400 hover:text-white transition-colors">Skip Intro</button>
+        </div>
+    </div>
+
+    <!-- PWA BANNER -->
+    <div x-show="showInstallBanner" x-transition class="bg-emerald-600 text-white px-4 py-3 flex items-center justify-between" x-cloak>
+        <div class="flex items-center gap-3">
+            <div class="bg-white/20 p-1.5 rounded-lg"><i data-lucide="download" class="w-5 h-5"></i></div>
+            <div>
+                <p class="text-sm font-semibold">Install AcademiaFlow App</p>
+                <p class="text-xs text-emerald-100">Add to home screen for offline use.</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <button @click="installApp()" class="px-3 py-1.5 bg-white text-emerald-700 text-xs font-bold rounded-lg hover:bg-emerald-50">Install</button>
+            <button @click="dismissInstallBanner()" class="p-1.5 text-emerald-200 hover:text-white rounded-lg"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <header class="sticky top-0 z-50 w-full backdrop-blur-md bg-white/80 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+                <div class="h-8 w-8 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center text-white font-bold shadow-md shrink-0">A</div>
+                <span class="font-extrabold text-lg sm:text-2xl font-montserrat tracking-tight">AcademiaFlow<span class="text-emerald-500">.</span></span>
+            </div>
+            <div class="flex items-center gap-2">
+                <a href="https://saamio.com/contact/" target="_blank" class="inline-flex items-center px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-700 h-[40px]">Contact</a>
+                <button x-show="deferredPrompt && !showInstallBanner" @click="installApp()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 text-xs font-semibold h-[40px] hover:bg-emerald-200" x-cloak>
+                    <i data-lucide="download" class="w-3.5 h-3.5"></i> Install App
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6 sm:py-8 overflow-y-auto">
+
+        <!-- TOAST -->
+        <div x-show="toastMessage" x-transition.opacity.duration.300ms class="fixed bottom-24 right-6 z-50 bg-emerald-600 text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 font-bold text-sm" x-cloak>
+            <i data-lucide="check-circle-2" class="w-4 h-4"></i> <span x-text="toastMessage"></span>
+        </div>
+
+        <!-- TAB: HOME -->
+        <div x-show="activeTab === 'home'" x-transition.opacity class="space-y-8">
+            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-950 p-6 sm:p-10 text-white shadow-2xl">
+                <div class="absolute top-0 right-0 -mt-8 -mr-8 w-64 h-64 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="relative z-10 max-w-3xl space-y-4">
+                    <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-bold uppercase tracking-wider">
+                        <i data-lucide="zap" class="w-3.5 h-3.5"></i> Unleash Your Potential
+                    </span>
+                    <h1 class="text-3xl sm:text-5xl font-black font-montserrat tracking-tight leading-tight">Engineer Your Success with Elite Focus.</h1>
+                    <p class="text-sm sm:text-base text-slate-300">Built for high-performers. Turn your academic trajectory into actionable data. Track, optimize, and dominate every degree program with absolute privacy and precision.</p>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xl">
+                <label class="block text-sm font-semibold mb-2">What's your name?</label>
+                <input type="text" x-model="state.studentName" placeholder="Enter your name..." class="w-full sm:max-w-sm px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
+            </div>
+
+            <div class="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xl text-center">
+                <span class="text-xs font-bold text-emerald-500 uppercase tracking-wider mb-2 block">Configuration</span>
+                <h2 class="text-2xl font-bold font-montserrat mb-6">Select Current Level</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <button @click="state.academicLevel = 'school'; activeTab = 'calculators'" class="p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-emerald-500 font-bold transition-all"><i data-lucide="school" class="mx-auto mb-2 text-emerald-500"></i> School</button>
+                    <button @click="state.academicLevel = 'undergraduate'; activeTab = 'calculators'" class="p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-emerald-500 font-bold transition-all"><i data-lucide="graduation-cap" class="mx-auto mb-2 text-emerald-500"></i> Undergrad</button>
+                    <button @click="state.academicLevel = 'postgraduate'; activeTab = 'calculators'" class="p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-emerald-500 font-bold transition-all"><i data-lucide="book-open" class="mx-auto mb-2 text-emerald-500"></i> Postgrad</button>
+                    <button @click="state.academicLevel = 'doctorate'; activeTab = 'calculators'" class="p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-emerald-500 font-bold transition-all"><i data-lucide="award" class="mx-auto mb-2 text-emerald-500"></i> Doctorate</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: CALCULATORS -->
+        <div x-show="activeTab === 'calculators'" x-transition.opacity class="space-y-6 bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xl" x-cloak>
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="p-3 bg-emerald-500/10 text-emerald-500 rounded-xl"><i data-lucide="calculator" class="w-6 h-6"></i></div>
+                    <div>
+                        <span class="text-xs uppercase font-bold text-emerald-500 tracking-wider">Dynamic Calculator</span>
+                        <h2 class="text-xl font-bold font-montserrat">Academic Records</h2>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <select x-model="state.academicLevel" class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold outline-none">
+                        <option value="school">School (1-12)</option>
+                        <option value="undergraduate">Undergraduate</option>
+                        <option value="postgraduate">Postgraduate</option>
+                        <option value="doctorate">Doctorate</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- School View -->
+            <div x-show="state.academicLevel === 'school'">
+                <div class="mb-4">
+                    <label class="text-xs font-bold uppercase block mb-1">Select Grade:</label>
+                    <select x-model="state.school.grade" class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold w-full sm:w-auto outline-none">
+                        <template x-for="i in 12"><option :value="'Grade ' + i" x-text="'Grade ' + i"></option></template>
+                    </select>
+                </div>
+
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-lg" x-text="state.school.grade + ' Exams'"></h3>
+                    <div class="flex gap-2">
+                        <button @click="addSchoolExam()" class="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 text-xs font-bold"><i data-lucide="plus" class="inline w-3 h-3"></i> Exam</button>
+                        <button @click="showToast('Locally Saved!')" class="px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-bold shadow-md shadow-emerald-500/20"><i data-lucide="save" class="inline w-3 h-3"></i> Save</button>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <template x-for="(exam, eIdx) in state.school.exams" :key="exam.id">
+                        <div class="bg-slate-50 dark:bg-slate-800/40 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 relative">
+                            <button @click="removeSchoolExam(eIdx)" class="absolute top-4 right-4 text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4 pr-8">
+                                <input type="text" x-model="exam.name" placeholder="Exam Name (e.g. Finals)" class="px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-bold w-full">
+                                <input type="text" x-model="exam.inst" placeholder="School/College Name" class="px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs w-full">
+                                <input type="text" x-model="exam.year" placeholder="Year" class="px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs w-full">
+                            </div>
+
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-bold uppercase text-emerald-500">Subjects</span>
+                                <button @click="addSchoolSub(eIdx)" class="text-[10px] bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 px-2 py-1 rounded font-bold">+ Subject</button>
+                            </div>
+                            <div class="space-y-2 overflow-x-auto max-w-full">
+                                <template x-for="(sub, sIdx) in exam.subjects" :key="sub.id">
+                                    <div class="flex gap-2 min-w-max items-center bg-white dark:bg-slate-900 p-2 rounded-xl border border-slate-200 dark:border-slate-700">
+                                        <input type="text" x-model="sub.name" class="px-2 py-1 rounded bg-slate-50 dark:bg-slate-800 text-xs w-32 border-none" placeholder="Subject">
+                                        <input type="number" x-model="sub.obt" class="px-2 py-1 rounded bg-slate-50 dark:bg-slate-800 text-xs w-20 border-none" placeholder="Obtained">
+                                        <span class="text-xs text-slate-500 font-bold">/</span>
+                                        <input type="number" x-model="sub.max" class="px-2 py-1 rounded bg-slate-50 dark:bg-slate-800 text-xs w-20 border-none" placeholder="Max">
+                                        <button @click="removeSchoolSub(eIdx, sIdx)" class="text-slate-400 hover:text-red-500 p-1"><i data-lucide="x" class="w-4 h-4"></i></button>
+                                    </div>
+                                </template>
+                                <p x-show="exam.subjects.length === 0" class="text-xs text-slate-500 italic py-2">No subjects. Add one to calculate percentages.</p>
+                            </div>
+                        </div>
+                    </template>
+                    <p x-show="state.school.exams.length === 0" class="text-sm text-center py-6 text-slate-500 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl">No exams added for this grade.</p>
+                </div>
+            </div>
+
+            <!-- Undergrad View (Simplified Representation) -->
+            <div x-show="state.academicLevel === 'undergraduate'">
+                 <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-lg">UG Degrees</h3>
+                    <div class="flex gap-2">
+                        <button @click="addUgDegree()" class="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 text-xs font-bold"><i data-lucide="plus" class="inline w-3 h-3"></i> Degree</button>
+                        <button @click="showToast('Locally Saved!')" class="px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-bold shadow-md shadow-emerald-500/20"><i data-lucide="save" class="inline w-3 h-3"></i> Save</button>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <template x-for="(deg, dIdx) in state.undergraduate" :key="deg.id">
+                        <div class="bg-slate-50 dark:bg-slate-800/40 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 relative">
+                            <button @click="removeUgDegree(dIdx)" class="absolute top-4 right-4 text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4 pr-8">
+                                <input type="text" x-model="deg.name" placeholder="Degree Name" class="px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-bold w-full">
+                                <input type="text" x-model="deg.col" placeholder="University Name" class="px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs w-full">
+                                <input type="number" x-model="deg.yrs" placeholder="Years" class="px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs w-full">
+                            </div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-bold uppercase text-emerald-500">Semesters</span>
+                                <button @click="addUgSem(dIdx)" class="text-[10px] bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 px-2 py-1 rounded font-bold">+ Sem</button>
+                            </div>
+                            <div class="space-y-3">
+                                <template x-for="(sem, sIdx) in deg.sems" :key="sem.num">
+                                     <div class="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
+                                         <div class="flex gap-2 items-center mb-2">
+                                             <span class="text-xs font-bold">Sem <span x-text="sem.num"></span> SGPA:</span>
+                                             <input type="number" step="0.01" x-model="sem.sgpa" class="px-2 py-1 rounded bg-slate-50 dark:bg-slate-800 text-xs w-20 border-none">
+                                             <button @click="addUgSub(dIdx, sIdx)" class="ml-auto text-[10px] bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded font-bold hover:bg-slate-200">+ Course</button>
+                                         </div>
+                                         <div class="space-y-2 overflow-x-auto">
+                                            <template x-for="(sub, subIdx) in sem.subs" :key="sub.id">
+                                                <div class="flex gap-2 min-w-max items-center p-1">
+                                                    <input type="text" x-model="sub.name" class="px-2 py-1 rounded bg-slate-50 dark:bg-slate-800 text-xs w-32 border-none" placeholder="Course">
+                                                    <input type="number" x-model="sub.obt" class="px-2 py-1 rounded bg-slate-50 dark:bg-slate-800 text-xs w-16 border-none" placeholder="Obt">
+                                                    <input type="number" x-model="sub.max" class="px-2 py-1 rounded bg-slate-50 dark:bg-slate-800 text-xs w-16 border-none" placeholder="Max">
+                                                    <button @click="removeUgSub(dIdx, sIdx, subIdx)" class="text-slate-400 hover:text-red-500"><i data-lucide="x" class="w-4 h-4"></i></button>
+                                                </div>
+                                            </template>
+                                         </div>
+                                     </div>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+                     <p x-show="state.undergraduate.length === 0" class="text-sm text-center py-6 text-slate-500 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl">No degrees added.</p>
+                </div>
+            </div>
+
+            <div x-show="state.academicLevel === 'postgraduate' || state.academicLevel === 'doctorate'" class="py-10 text-center text-slate-500 italic">
+                <i data-lucide="tools" class="w-10 h-10 mx-auto mb-2 text-slate-300 dark:text-slate-700"></i>
+                <p>This layout behaves similarly to Undergraduate. Utilize arrays to add unlimited fields.</p>
+            </div>
+        </div>
+
+        <!-- TAB: PRODUCTIVITY -->
+        <div x-show="activeTab === 'productivity'" x-transition.opacity class="space-y-6" x-cloak>
+             <div class="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xl space-y-6">
+                <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-4">
+                    <h2 class="text-xl font-bold font-montserrat flex items-center gap-2"><i data-lucide="layout-list" class="text-emerald-500"></i> Productivity Suite</h2>
+                    <button @click="showToast('Locally Saved!')" class="px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-bold shadow-md shadow-emerald-500/20"><i data-lucide="save" class="inline w-3 h-3"></i> Save</button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Tasks -->
+                    <div class="space-y-4 p-4 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-200 dark:border-slate-700">
+                        <div class="flex justify-between items-center">
+                            <h3 class="font-bold text-sm">To-Do Tasks</h3>
+                            <button @click="addTask()" class="text-[10px] bg-emerald-600 text-white px-2 py-1 rounded font-bold shadow">+ Add</button>
+                        </div>
+                        <div class="space-y-2 max-h-[300px] overflow-y-auto pr-1">
+                            <template x-for="(task, idx) in state.todos" :key="task.id">
+                                <div class="flex justify-between items-center bg-white dark:bg-slate-900 p-3 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800" :class="task.done ? 'opacity-60' : ''">
+                                    <div class="flex items-center gap-2 overflow-hidden">
+                                        <input type="checkbox" x-model="task.done" class="rounded text-emerald-500 accent-emerald-500">
+                                        <span class="text-xs font-semibold truncate" :class="task.done ? 'line-through' : ''" x-text="task.title"></span>
+                                    </div>
+                                    <button @click="removeTask(idx)" class="text-slate-400 hover:text-red-500 shrink-0"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                </div>
+                            </template>
+                            <p x-show="state.todos.length===0" class="text-xs text-slate-500 text-center py-4">No tasks found.</p>
+                        </div>
+                    </div>
+
+                    <!-- Notes -->
+                    <div class="space-y-4 p-4 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-200 dark:border-slate-700">
+                         <div class="flex justify-between items-center">
+                            <h3 class="font-bold text-sm">Quick Notes</h3>
+                            <button @click="addNote()" class="text-[10px] bg-emerald-600 text-white px-2 py-1 rounded font-bold shadow">+ Add</button>
+                        </div>
+                        <div class="space-y-2 max-h-[300px] overflow-y-auto pr-1">
+                            <template x-for="(note, idx) in state.notes" :key="note.id">
+                                <div class="bg-white dark:bg-slate-900 p-3 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 relative group">
+                                    <button @click="removeNote(idx)" class="absolute top-2 right-2 text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"><i data-lucide="x" class="w-4 h-4"></i></button>
+                                    <h4 class="text-xs font-bold mb-1 pr-6" x-text="note.title"></h4>
+                                    <p class="text-[10px] text-slate-500 whitespace-pre-wrap" x-text="note.content"></p>
+                                </div>
+                            </template>
+                            <p x-show="state.notes.length===0" class="text-xs text-slate-500 text-center py-4">No notes found.</p>
+                        </div>
+                    </div>
+                </div>
+             </div>
+        </div>
+
+        <!-- TAB: DATA -->
+        <div x-show="activeTab === 'data'" x-transition.opacity class="space-y-6" x-cloak>
+            <div class="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xl space-y-6">
+                <div class="flex items-center gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
+                    <div class="p-3 bg-emerald-500/10 text-emerald-500 rounded-xl"><i data-lucide="database" class="w-6 h-6"></i></div>
+                    <div>
+                        <h2 class="text-xl font-bold font-montserrat">Data Management</h2>
+                        <p class="text-xs text-slate-500">Export & Import local storage backup.</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3 items-center">
+                    <button @click="exportJSON()" class="w-full sm:flex-1 py-3 rounded-xl bg-slate-800 text-white font-bold text-sm hover:bg-slate-700 flex items-center justify-center gap-2 shadow-lg"><i data-lucide="download" class="w-4 h-4"></i> Export JSON Backup</button>
+                    <button @click="exportCSV()" class="w-full sm:flex-1 py-3 rounded-xl bg-emerald-600 text-white font-bold text-sm hover:bg-emerald-500 flex items-center justify-center gap-2 shadow-lg"><i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Export CSV (Excel)</button>
+                    <label class="w-full sm:flex-1 py-3 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold text-sm hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center justify-center gap-2 cursor-pointer transition-colors">
+                        <i data-lucide="upload" class="w-4 h-4"></i> Import JSON Data
+                        <input type="file" accept=".json" @change="importData" class="hidden">
+                    </label>
+                </div>
+
+                <div class="bg-slate-50 dark:bg-slate-800/50 p-5 rounded-2xl border border-slate-200 dark:border-slate-700/50 text-sm text-slate-700 dark:text-slate-300 space-y-2">
+                    <p class="font-bold flex items-center gap-2"><i data-lucide="info" class="w-4 h-4 text-emerald-500"></i> How to transfer devices:</p>
+                    <ol class="list-decimal pl-6 space-y-1 text-xs">
+                        <li>Click <b>Export JSON Backup</b> on your current device.</li>
+                        <li>Send the downloaded `.json` file to your new device.</li>
+                        <li>Open the app on the new device, go to Data Tab, and <b>Import JSON Data</b>.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <footer class="w-full bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 text-center space-y-6 shadow-xl">
+              <p class="text-xs font-medium text-slate-500 dark:text-slate-400">
+                &copy; 2026 AcademiaFlow. All rights reserved. &mdash; Zero-backend static tracking architecture.
+              </p>
+              <div class="flex justify-center">
+                <a href="https://saamio.com" target="_blank" class="inline-flex items-center px-8 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-xl transition-transform hover:-translate-y-0.5">
+                  Powered by Saamio
+                </a>
+              </div>
+            </footer>
+        </div>
+
+    </main>
+
+    <!-- BOTTOM NAV -->
+    <nav class="fixed bottom-0 left-0 w-full bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 pb-safe shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)] z-50">
+        <div class="max-w-md mx-auto px-6 h-16 flex items-center justify-between">
+            <button @click="activeTab = 'home'" :class="activeTab === 'home' ? 'text-emerald-500 font-bold' : 'text-slate-500'" class="flex flex-col items-center justify-center w-16 h-full space-y-1 transition-colors">
+                <i data-lucide="home" class="w-5 h-5"></i>
+                <span class="text-[10px]">Home</span>
+            </button>
+            <button @click="activeTab = 'calculators'" :class="activeTab === 'calculators' ? 'text-emerald-500 font-bold' : 'text-slate-500'" class="flex flex-col items-center justify-center w-16 h-full space-y-1 transition-colors">
+                <i data-lucide="calculator" class="w-5 h-5"></i>
+                <span class="text-[10px]">Grades</span>
+            </button>
+            <button @click="activeTab = 'productivity'" :class="activeTab === 'productivity' ? 'text-emerald-500 font-bold' : 'text-slate-500'" class="flex flex-col items-center justify-center w-16 h-full space-y-1 transition-colors">
+                <i data-lucide="layout-list" class="w-5 h-5"></i>
+                <span class="text-[10px]">Tasks</span>
+            </button>
+            <button @click="activeTab = 'data'" :class="activeTab === 'data' ? 'text-emerald-500 font-bold' : 'text-slate-500'" class="flex flex-col items-center justify-center w-16 h-full space-y-1 transition-colors">
+                <i data-lucide="database" class="w-5 h-5"></i>
+                <span class="text-[10px]">Data</span>
+            </button>
+        </div>
+    </nav>
+
+    <script src="/app.js"></script>
+    <script>
+        lucide.createIcons();
+        document.addEventListener('alpine:initialized', () => {
+            Alpine.effect(() => {
+                // Re-render lucide icons when state/DOM changes
+                setTimeout(() => lucide.createIcons(), 50);
+            });
+        });
+
+        // PWA Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
+            });
+        }
+    </script>
+</body>
+</html>
